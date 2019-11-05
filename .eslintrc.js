@@ -19,4 +19,5 @@ module.exports = {
     "linebreak-style": 0,  // accept CRLF at end of lines (as opposed to requiring only LF)
     "comma-dangle": 0
   },
+  "env": { "node": true, "mocha": true }
 };

@@ -1,6 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+// if we're not running in a production environment, load and activate dotenv 
+// (to utilize substitutions within .env file)
+if (process.env.ENV !== 'production') {
+  require('dotenv').config();
+}
+
 // access the Book model
 const Book = require('./models/book');
 // create Book router and inject the Book model
@@ -11,7 +17,16 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const connectionString = process.env.DATABASE_URL;
+let connectionString = null;
+if (process.env.ENV === 'Test') {
+  console.log('Running in TEST mode');
+  connectionString = process.env.DATABASE_URL_TEST;
+  console.log(`process.env.DATABASE_URL_TEST: ${process.env.DATABASE_URL_TEST}`);
+  // connectionString = 'mongodb+srv://tkent_dna:mongoCloudAtlas12!@cluster0-pft9s.azure.mongodb.net/RestfulWebServicesWithNodeJs_Test?retryWrites=true&w=majority';
+} else {
+  console.log('Running in PRODUCTION mode');
+  connectionString = process.env.DATABASE_URL;
+}
 console.log(`DB Connection String: ${connectionString}`);
 
 // handles any error generated when connecting to a Mongo DB
@@ -43,6 +58,8 @@ app.get('/', (request, response) => {
   response.send('Welcome to my API!');
 });
 
-app.listen(port, () => {
+app.server = app.listen(port, () => {
   console.log(`Running on port: ${port}`);
 });
+
+module.exports = app;
