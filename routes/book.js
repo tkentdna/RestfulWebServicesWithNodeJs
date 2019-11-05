@@ -48,7 +48,16 @@ function routes(Book) {
     // The bookRouter.use('/books/:bookId'...) method above will have found the
     // requested book (by its Id) and passed it to here.  So, we merely need to
     // get the book from the 'req' (request) object and send back the book in the response.
-    .get((req, res) => res.json(req.book))
+    .get((req, res) => {
+      // res.json(req.book);
+      // sample of adding a reference to indicated filtering by a genre, as an application of
+      // HATEOAS - Hypermedia As The Engine Of Application State
+      const returnBook = req.book.toJSON();
+      returnBook.links = {};
+      const genre = req.book.genre.replace(' ', '%20'); // encode spaces in the URL
+      returnBook.links.FilterByThisGenre = `http://${req.headers.host}/api/books/?genre=${genre}`;
+      res.json(returnBook);
+    })
     // (PUT/:id) Update all fields of a single book per the Id of the book.
     // The bookRouter.use('/books/:bookId'...) method above will have found the
     // requested book (by its Id) and passed it to here.  So, we merely need to

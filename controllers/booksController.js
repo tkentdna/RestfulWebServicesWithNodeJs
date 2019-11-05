@@ -41,7 +41,19 @@ function booksController(Book) {
           retValue = res.send(error);
         } else {
           console.log(`Book.find() succeeded, returning (${books ? books.length : 0})`);
-          retValue = res.json(books);
+          // retValue = res.json(books);
+
+          // add a hyperlink to each book's return object, providing a hyperlink directly to
+          // the individual book, as an application of
+          // HATEOAS - Hypermedia As The Engine Of Application State
+          const returnBooks = books.map((book) => {
+            const newBook = book.toJSON();
+            newBook.links = {};
+            newBook.links.self = `http://${req.headers.host}/api/books/${book._id}`;
+            return newBook;
+          });
+
+          retValue = res.json(returnBooks);
         }
       });
     } catch (error) {
